@@ -1,0 +1,137 @@
+###############################################################################
+## Monit control file
+###############################################################################
+##
+## Comments begin with a '#' and extend through the end of the line. Keywords
+## are case insensitive. All path's MUST BE FULLY QUALIFIED, starting with '/'.
+##
+## Below you will find examples of some frequently used statements. For 
+## information about the control file and a complete list of statements and 
+## options, please have a look in the Monit manual.
+##
+##
+###############################################################################
+## Global section
+###############################################################################
+##
+## Start Monit in the background (run as a daemon):
+#
+  set daemon 120            # check services at 2-minute intervals
+#   with start delay 240    # optional: delay the first check by 4-minutes (by 
+#                           # default Monit check immediately after Monit start)
+#
+#
+## Set syslog logging with the 'daemon' facility. If the FACILITY option is
+## omitted, Monit will use 'user' facility by default. If you want to log to 
+## a standalone log file instead, specify the full path to the log file
+#
+# set logfile syslog facility log_daemon                       
+  set logfile /var/log/monit.log
+#
+#
+## Set the location of the Monit id file which stores the unique id for the
+## Monit instance. The id is generated and stored on first Monit start. By 
+## default the file is placed in $HOME/.monit.id.
+#
+# set idfile /var/.monit.id
+  set idfile /var/lib/monit/id
+#
+## Set the location of the Monit state file which saves monitoring states
+## on each cycle. By default the file is placed in $HOME/.monit.state. If
+## the state file is stored on a persistent filesystem, Monit will recover
+## the monitoring state across reboots. If it is on temporary filesystem, the
+## state will be lost on reboot which may be convenient in some situations.
+#
+  set statefile /var/lib/monit/state
+#
+## Set the list of mail servers for alert delivery. Multiple servers may be 
+## specified using a comma separator. If the first mail server fails, Monit 
+# will use the second mail server in the list and so on. By default Monit uses 
+# port 25 - it is possible to override this with the PORT option.
+#
+  set mailserver master
+# set mailserver mail.bar.baz,               # primary mailserver
+#                backup.bar.baz port 10025,  # backup mailserver on port 10025
+#                localhost                   # fallback relay
+#
+#
+## By default Monit will drop alert events if no mail servers are available. 
+## If you want to keep the alerts for later delivery retry, you can use the 
+## EVENTQUEUE statement. The base directory where undelivered alerts will be 
+## stored is specified by the BASEDIR option. You can limit the maximal queue
+## size using the SLOTS option (if omitted, the queue is limited by space 
+## available in the back end filesystem).
+#
+  set eventqueue
+      basedir /var/lib/monit/events # set the base directory where events will be stored
+      slots 100                     # optionally limit the queue size
+#
+#
+## Send status and events to M/Monit (for more informations about M/Monit 
+## see http://mmonit.com/). By default Monit registers credentials with 
+## M/Monit so M/Monit can smoothly communicate back to Monit and you don't
+## have to register Monit credentials manually in M/Monit. It is possible to
+## disable credential registration using the commented out option below. 
+## Though, if safety is a concern we recommend instead using https when
+## communicating with M/Monit and send credentials encrypted.
+#
+# set mmonit http://monit:monit@192.168.1.10:8080/collector
+#     # and register without credentials     # Don't register credentials
+#
+#
+## Monit by default uses the following format for alerts if the the mail-format
+## statement is missing::
+## --8<--
+## set mail-format {
+##      from: monit@$HOST
+##   subject: monit alert --  $EVENT $SERVICE
+##   message: $EVENT Service $SERVICE
+##                 Date:        $DATE
+##                 Action:      $ACTION
+##                 Host:        $HOST
+##                 Description: $DESCRIPTION
+##
+##            Your faithful employee,
+##            Monit
+## }
+## --8<--
+##
+## You can override this message format or parts of it, such as subject
+## or sender using the MAIL-FORMAT statement. Macros such as $DATE, etc.
+## are expanded at runtime. For example, to override the sender, use:
+#
+  set mail-format { from: $HOST-monit@domain.tld }
+# set mail-format { from: monit@foo.bar }
+#
+#
+## You can set alert recipients whom will receive alerts if/when a 
+## service defined in this file has errors. Alerts may be restricted on 
+## events by using a filter as in the second example below. 
+#
+  set alert ops-announcements@domain.tld
+# set alert sysadm@foo.bar                       # receive all alerts
+# set alert manager@foo.bar only on { timeout }  # receive just service-
+#                                                # timeout alert
+#
+#
+## Monit has an embedded web server which can be used to view status of 
+## services monitored and manage services from a web interface. See the
+## Monit Wiki if you want to enable SSL for the web server. 
+#
+# set httpd port 2812 and
+#    use address localhost  # only accept connection from localhost
+#    allow localhost        # allow localhost to connect to the server and
+#    allow admin:monit      # require user 'admin' with password 'monit'
+#    allow @monit           # allow users of group 'monit' to connect (rw)
+#    allow @users readonly  # allow users of group 'users' to connect readonly
+#
+###############################################################################
+## Services
+###############################################################################
+#
+## Checkers were split across files in `conf.d`
+#
+###############################################################################
+## Includes
+###############################################################################
+   include /etc/monit/conf.d/*

@@ -1,0 +1,7 @@
+# default server when the host header field is blank.
+# http://nginx.org/en/docs/http/request_processing.html
+server {
+  listen 80;
+  return 444;
+  access_log off;
+}

@@ -1,0 +1,3 @@
+check host db with address db
+  if failed icmp type echo count 3 with timeout 3 seconds then alert
+  if failed port 3306 protocol mysql with timeout 15 seconds then alert

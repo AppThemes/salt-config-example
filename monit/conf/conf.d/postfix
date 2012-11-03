@@ -1,0 +1,5 @@
+check process postfix with pidfile /var/spool/postfix/pid/master.pid
+   start program = "/sbin/start postfix"
+   stop  program = "/sbin/stop postfix"
+   if failed port 25 protocol smtp then restart
+   if 5 restarts within 5 cycles then timeout

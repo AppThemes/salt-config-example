@@ -1,0 +1,5 @@
+check program ufw with path "/etc/monit/check-ufw.sh"
+  start program = "/sbin/start ufw"
+  stop program  = "/sbin/stop ufw"
+  if status != 0 then restart
+  if 5 restarts within 5 cycles then timeout

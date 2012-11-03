@@ -1,0 +1,4 @@
+check host staging with address staging
+  if failed icmp type echo count 3 with timeout 3 seconds then alert
+  if failed port 80 for 3 times within 5 cycles then alert
+  if failed port 443 for 3 times within 5 cycles then alert

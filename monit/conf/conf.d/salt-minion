@@ -1,0 +1,4 @@
+check process salt-minion with pidfile /var/run/salt-minion.pid
+  start program = "/sbin/start salt-minion"
+  stop program  = "/sbin/stop salt-minion"
+  if 5 restarts within 5 cycles then timeout

@@ -1,0 +1,5 @@
+check process salt-master with pidfile /var/run/salt-master.pid
+  start program = "/sbin/start salt-master"
+  stop program  = "/sbin/stop salt-master"
+  if failed host master port 4505 then restart
+  if 5 restarts within 5 cycles then timeout

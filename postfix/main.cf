@@ -1,0 +1,67 @@
+# See /usr/share/postfix/main.cf.dist for a commented, more complete version
+
+
+# Debian specific:  Specifying a file name will cause the first
+# line of that file to be used as the name.  The Debian default
+# is /etc/mailname.
+#myorigin = /etc/mailname
+
+smtpd_banner = $myhostname ESMTP
+biff = no
+
+# appending .domain is the MUA's job.
+append_dot_mydomain = no
+
+# Uncomment the next line to generate "delayed mail" warnings
+#delay_warning_time = 4h
+
+readme_directory = no
+
+# TLS parameters
+smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_use_tls=yes
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+
+# See /usr/share/doc/postfix/TLS_README.gz in the postfix-doc package for
+# information on enabling SSL in the smtp client.
+
+# don't need to set since default uses fqdn from hostname -f
+#myhostname = localhost
+
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+myorigin = /etc/mailname
+mydestination =
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+mailbox_size_limit = 0
+recipient_delimiter = +
+inet_interfaces = loopback-only
+inet_protocols = all
+
+
+## added for mandrill support ##
+
+## before this will work, the fqdn must be set in /etc/hosts
+## i.e. 127.0.0.1 your-server.website.com your-server localhost
+## reload postfix, test email, tail log to make sure "from"
+## name is being set using fqdn. if not, apt-get purge postfix
+## apt-get install postfix mailutils enter fqdn in wizard
+## and then push salt out again
+
+relayhost = [smtp.mandrillapp.com]
+
+# enable SASL authentication
+smtp_sasl_auth_enable = yes
+
+# tell Postfix where the credentials are stored
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+smtp_sasl_security_options = noanonymous
+
+# use STARTTLS encryption if supported by remote server
+# I enabled this but didn't seem to do anything
+#smtp_tls_security_level = may
+
+
+## end mandrill addition ##

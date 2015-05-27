@@ -13,7 +13,6 @@ postfix:
     - watch:
       - file: /etc/postfix/main.cf
       - file: /etc/postfix/sasl_passwd
-      - file: /etc/postfix/virtual
 
 # Config for core
 /etc/postfix/main.cf:

@@ -7,12 +7,10 @@ nginx:
       - pkg: nginx
       - file: /etc/nginx
       - file: /etc/nginx/htpasswd
-    - watch:
-      - file: /etc/nginx/timestamp
 
-/etc/nginx/timestamp:
-  file.managed:
-    - source: salt://nginx/timestamp
+
+### CONFIG FILES ###
+
 
 # Configuration files for nginx
 /etc/nginx:
@@ -20,7 +18,7 @@ nginx:
     - source: salt://nginx/config
     - user: root
     - group: root
-    - mode: 644
+    - file_mode: 644
 
 /etc/nginx/htpasswd:
   file.recurse:
@@ -29,3 +27,23 @@ nginx:
     - group: www-data
     - dir_mode: 544
     - file_mode: 444
+
+
+
+### VHOSTS ###
+
+
+# symlink the site
+/etc/nginx/sites-enabled/www.website.com:
+  file.symlink:
+    - target: /etc/nginx/sites-available/www.website.com
+    - user: www-data
+    - group: www-data
+
+# symlink another site
+/etc/nginx/sites-enabled/support.website.com:
+  file.symlink:
+    - target: /etc/nginx/sites-available/support.website.com
+    - user: www-data
+    - group: www-data
+

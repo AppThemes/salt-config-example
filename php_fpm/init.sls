@@ -4,21 +4,11 @@ php_stack:
     - name: php5-fpm
   service.running:
     - name: php5-fpm
-    - require:
-      - pkg: php5-fpm
-      - pkg: php5-gd
-      - pkg: php5-mysql
-      - pkg: php5-suhosin
-      - pkg: php5-memcache
-      - pkg: php5-mcrypt
-      - pkg: php5-curl
-      - pkg: php5-cli
-      - pkg: php-apc
-      - pkg: mysql-client
     - watch:
       - file: /etc/php5/fpm/php-fpm.conf
       - file: /etc/php5/fpm/pool.d/www.conf
       - file: /etc/php5/fpm/conf.d/apc.ini
+      - file: /etc/php5/fpm/conf.d/suhosin.ini
       - file: /etc/php5/fpm/php.ini
 
 php_gd:
@@ -32,10 +22,6 @@ php_mysql:
 php_suhosin:
   pkg.installed:
     - name: php5-suhosin
-
-php_memcache:
-  pkg.installed:
-    - name: php5-memcache
 
 php_mcrypt:
   pkg.installed:
@@ -56,6 +42,12 @@ php_apc:
 mysql_client:
   pkg.installed:
     - name: mysql-client
+
+php_pear:
+  pkg.installed:
+    - name: php-pear
+
+
 
 # Configuration files for php5-fpm
 /etc/php5/fpm/php-fpm.conf:
@@ -79,6 +71,13 @@ mysql_client:
     - group: root
     - mode: 644
 
+/etc/php5/fpm/conf.d/suhosin.ini:
+  file.managed:
+    - source: salt://php_fpm/suhosin.ini
+    - user: root
+    - group: root
+    - mode: 644
+
 /etc/php5/fpm/php.ini:
   file.managed:
     - source: salt://php_fpm/php.ini
@@ -86,19 +85,10 @@ mysql_client:
     - group: root
     - mode: 644
 
-{% if salt['cmd.has_exec']('git') %}
-wp_cli:
-  git.latest:
-    - name: git://github.com/wp-cli/wp-cli.git
-    - rev: master
-    - target: /url/lib/wp-cli
-    - runas: root
-    - submodules: True
-    - force: False
-    - require:
-      - pkg: php5-cli
-
 /usr/bin/wp:
-  file.symlink:
-    - target: /usr/lib/wp-cli/src/bin/wp
-{% endif %}
+  file.managed:
+    - source: http://wp-cli.org/builds/phar/wp-cli.phar
+    - source_hash: md5=b92c863f0de5ae58405f58d7d50d7084
+    - user: root
+    - group: root
+    - mode: 755
